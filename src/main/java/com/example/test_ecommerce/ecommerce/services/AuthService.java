@@ -1,5 +1,7 @@
 package com.example.test_ecommerce.ecommerce.services;
 
+import java.util.logging.Logger;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -57,13 +59,13 @@ public class AuthService {
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
         user.setUserType(type);
-        userRepository.save(user);
+        Users user1 = userRepository.save(user);
 
         // auto-login and return token
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(registerRequest.getUsername(), registerRequest.getPassword()));
         String token = jwtUtiles
-                .generateToken((UserDetails) auth.getPrincipal());
+                .generateToken((UserDetails) auth.getPrincipal(), user.getId());
         return new AuthResponse(username, email, userType, token);
     }
 
@@ -82,7 +84,7 @@ public class AuthService {
                 .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getLogin(),
                         loginRequest.getPassword()));
         String token = jwtUtiles
-                .generateToken((UserDetails) auth.getPrincipal());
+                .generateToken((UserDetails) auth.getPrincipal(), user.getId());
         return new AuthResponse(
                 user.getUsername(),
                 user.getEmail(),

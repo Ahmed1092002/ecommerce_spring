@@ -1,6 +1,8 @@
 package com.example.test_ecommerce.ecommerce.security.jwt;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.crypto.SecretKey;
 
@@ -22,9 +24,14 @@ public class JwtUtiles {
     @Value("${jwt.expiration}")
     private Long expirationTime;
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(UserDetails userDetails, Long userId) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", userDetails.getAuthorities());
+        claims.put("userId", userId);
+
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
         return Jwts.builder()
+                .setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
@@ -33,6 +40,16 @@ public class JwtUtiles {
     }
 
     public String extractUsername(String token) {
+        SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
+
+    public String extractUserId(String token) {
         SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
         return Jwts.parserBuilder()
                 .setSigningKey(key)
