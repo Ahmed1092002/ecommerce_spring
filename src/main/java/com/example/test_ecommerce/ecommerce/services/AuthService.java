@@ -59,13 +59,13 @@ public class AuthService {
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
         user.setUserType(type);
-        Users user1 = userRepository.save(user);
+        Users createdUser = userRepository.save(user);
 
         // auto-login and return token
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(registerRequest.getUsername(), registerRequest.getPassword()));
         String token = jwtUtiles
-                .generateToken((UserDetails) auth.getPrincipal(), user.getId());
+                .generateToken((UserDetails) auth.getPrincipal(), createdUser.getId());
         return new AuthResponse(username, email, userType, token);
     }
 

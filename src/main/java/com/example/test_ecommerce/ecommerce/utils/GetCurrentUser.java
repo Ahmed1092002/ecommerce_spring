@@ -4,6 +4,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import com.example.test_ecommerce.ecommerce.entitiy.Users;
+import com.example.test_ecommerce.ecommerce.enums.UserType;
 import com.example.test_ecommerce.ecommerce.repository.UserRepository;
 
 import org.springframework.security.core.Authentication;
@@ -32,5 +33,9 @@ public class GetCurrentUser {
 
     public Long getCurrentUserId() {
         return getCurrentUser().getId();
+    }
+
+    public UserType getCurrentUserRole() {
+        return getCurrentUser().getUserType();
     }
 }

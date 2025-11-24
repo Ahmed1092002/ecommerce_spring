@@ -1,8 +1,7 @@
 package com.example.test_ecommerce.ecommerce.dto.ProductsDto;
 
-import org.springframework.security.access.method.P;
-
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
@@ -14,8 +13,10 @@ public class ProductCreateDto {
     @NotBlank(message = "Price is mandatory")
     private Double price;
     @NotBlank(message = "Rating is mandatory")
+    @Size(min = 0, max = 5, message = "Rating must be between 0 and 5")
     private Double rating;
     @NotBlank(message = "Quantity is mandatory")
+    @Size(min = 1, message = "Quantity must be at least 1")
     private Integer quantity;
 
 }

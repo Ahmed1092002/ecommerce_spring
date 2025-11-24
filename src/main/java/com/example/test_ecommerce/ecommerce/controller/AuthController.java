@@ -3,6 +3,7 @@ package com.example.test_ecommerce.ecommerce.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.test_ecommerce.ecommerce.dto.UserDto.AuthResponse;
 import com.example.test_ecommerce.ecommerce.dto.UserDto.LoginRequest;
 import com.example.test_ecommerce.ecommerce.dto.UserDto.RegisterRequest;
 import com.example.test_ecommerce.ecommerce.services.AuthService;
@@ -23,14 +24,14 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
         // TODO: process POST request
 
         return ResponseEntity.ok(authService.login(loginRequest));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest registerRequest) {
         // TODO: process POST request
         return ResponseEntity.ok(authService.register(registerRequest));
     }
