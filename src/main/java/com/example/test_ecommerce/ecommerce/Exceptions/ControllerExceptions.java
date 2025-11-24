@@ -2,7 +2,6 @@ package com.example.test_ecommerce.ecommerce.Exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -40,13 +39,19 @@ public class ControllerExceptions {
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError("Runtime Exception");
+        errorResponse.setMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 
     @ExceptionHandler(JwtException.class)
-    public ResponseEntity<String> handleJwtException(JwtException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    public ResponseEntity<ErrorResponse> handleJwtException(JwtException ex) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError("JWT Exception");
+        errorResponse.setMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
     @ExceptionHandler(ServletException.class)

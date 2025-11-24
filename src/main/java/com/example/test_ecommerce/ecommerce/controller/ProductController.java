@@ -23,9 +23,8 @@ public class ProductController {
 
     @PreAuthorize("hasRole('SELLER')")
     @PostMapping("/CreateProduct")
-    public ResponseEntity<String> postMethodName(@Valid @RequestBody ProductCreateDto entity) {
-
-        return ResponseEntity.ok(productService.CreateProduct(entity));
+    public ResponseEntity<String> createProduct(@Valid @RequestBody ProductCreateDto productCreateDto) {
+        return ResponseEntity.ok(productService.createProduct(productCreateDto));
     }
 
 }

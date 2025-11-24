@@ -45,9 +45,6 @@ public class AuthService {
         if (userRepository.existsByEmail(email)) {
             throw new UserCustomExceptions("Email is already in use");
         }
-        if (!userType.equals("CUSTOMER") && !userType.equals("SELLER")) {
-            throw new UserCustomExceptions("Invalid user type");
-        }
         UserType type;
         try {
             type = UserType.valueOf(userType.toUpperCase());

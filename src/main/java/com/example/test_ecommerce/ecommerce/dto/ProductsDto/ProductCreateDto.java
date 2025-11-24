@@ -18,5 +18,7 @@ public class ProductCreateDto {
     @NotBlank(message = "Quantity is mandatory")
     @Size(min = 1, message = "Quantity must be at least 1")
     private Integer quantity;
-
+    @NotBlank(message = "Discount is mandatory")
+    @Size(min = 0, max = 100, message = "Discount must be between 0 and 100")
+    private Double discount;
 }
