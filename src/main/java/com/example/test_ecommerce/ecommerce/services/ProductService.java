@@ -133,7 +133,12 @@ public class ProductService {
         return "Product deleted successfully : " + product.getName();
     }
 
-    public String updateProduct(ProductUpdateDto productUpdateDto) { 
+    public Products getProductById(Long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+    }
+
+    public String updateProduct(ProductUpdateDto productUpdateDto) {
         Long userId = getCurrentUser.getCurrentUserId();
         Products existingProduct = productRepository.findById(productUpdateDto.getId())
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + productUpdateDto.getId()));
