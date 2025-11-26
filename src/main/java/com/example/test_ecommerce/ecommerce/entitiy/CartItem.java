@@ -1,5 +1,7 @@
 package com.example.test_ecommerce.ecommerce.entitiy;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PreUpdate;
 import lombok.Data;
 
 @Data
@@ -33,5 +36,6 @@ public class CartItem {
 
     @Column(nullable = false)
     private Double totalPrice;
+
 
 }

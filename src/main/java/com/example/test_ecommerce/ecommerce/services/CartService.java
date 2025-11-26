@@ -3,6 +3,7 @@ package com.example.test_ecommerce.ecommerce.services;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.test_ecommerce.ecommerce.dto.CartItemDto.CartItemDto;
 import com.example.test_ecommerce.ecommerce.dto.CartItemDto.CartItemDtoList;
@@ -15,6 +16,7 @@ import com.example.test_ecommerce.ecommerce.enums.CartStatus;
 import com.example.test_ecommerce.ecommerce.repository.CartItemRepository;
 import com.example.test_ecommerce.ecommerce.repository.CartRepository;
 import com.example.test_ecommerce.ecommerce.utils.GetCurrentUser;
+import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductSearchResponceDto;
 
 @Service
 public class CartService {
@@ -47,20 +49,31 @@ public class CartService {
         return cart;
     }
 
+    @Transactional
     public String addItemToCart(CartItemDto cartItem) {
         Cart cart = createCart();
-        Products product = productService.getProductById(cartItem.getProductId());
-        CartItem existingItem = cartItemRepository.findByCartIdAndProductId(cart.getId(), product.getId());
+        ProductSearchResponceDto productDto = productService.getProductById(cartItem.getProductId());
+        if (productDto.getQuantity() < cartItem.getQuantity()) {
+            throw new RuntimeException("Insufficient stock. Available: " + productDto.getQuantity());
+        }
+        CartItem existingItem = cartItemRepository.findByCartIdAndProductId(cart.getId(), productDto.getId());
 
         if (existingItem != null) {
-            existingItem.setQuantity(existingItem.getQuantity() + cartItem.getQuantity());
+            int newQuantity = existingItem.getQuantity() + cartItem.getQuantity();
+            if (productDto.getQuantity() < newQuantity) {
+                throw new RuntimeException("Insufficient stock. Available: " + productDto.getQuantity());
+            }
+
+            existingItem.setQuantity(newQuantity);
             existingItem.setTotalPrice(existingItem.getPrice() * existingItem.getQuantity());
             cartItemRepository.save(existingItem);
             return "Item quantity updated successfully.";
         } else {
             double price = productService.calculateFinalPrice(
-                    product.getPrice(),
-                    product.getDiscount());
+                    productDto.getPrice(),
+                    productDto.getDiscount());
+            Products product = productService.getProductEntityById(cartItem.getProductId());
+
             CartItem newCartItem = new CartItem();
             newCartItem.setCart(cart);
             newCartItem.setProduct(product);
@@ -74,11 +87,23 @@ public class CartService {
 
     }
 
-    public CartItemsResponceDto getCart(Long userId) {
-        Cart cart = cartRepository.findByUserId(userId);
+    public CartItemsResponceDto getCart() {
+        Users user = getCurrentUser.getCurrentUser();
+        Cart cart = cartRepository.findByUserId(user.getId());
+        CartItemsResponceDto responseDto = new CartItemsResponceDto();
+
+        if (cart == null) {
+            responseDto.setCartItems(List.of());
+            responseDto.setTotalItems(0);
+            responseDto.setTotalCartPrice(0.0);
+            responseDto.setTotalQuantity(0);
+            responseDto.setTotalDiscount(0.0);
+            return responseDto;
+        }
         List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getId());
         List<CartItemDtoList> responceDtos = cartItems.stream().map(item -> {
             CartItemDtoList dto = new CartItemDtoList();
+            dto.setCartItemId(item.getId());
             dto.setProductId(item.getProduct().getId());
             dto.setName(item.getProduct().getName());
             dto.setQuantity(item.getQuantity());
@@ -87,7 +112,6 @@ public class CartService {
             return dto;
         }).toList();
 
-        CartItemsResponceDto responseDto = new CartItemsResponceDto();
         responseDto.setCartItems(responceDtos);
         responseDto.setTotalItems(responceDtos.size());
         double totalPrice = responceDtos.stream()
@@ -109,22 +133,38 @@ public class CartService {
         return responseDto;
     }
 
+    @Transactional
+
     public String deleteItemFromCart(Long cartItemId) {
         CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new RuntimeException("Cart item not found with id: " + cartItemId));
+        Users currentUser = getCurrentUser.getCurrentUser();
+        if (!cartItem.getCart().getUser().getId().equals(currentUser.getId())) {
+            throw new RuntimeException("Unauthorized access to cart item");
+        }
         cartItemRepository.delete(cartItem);
         return "Cart item deleted successfully.";
     }
 
+    @Transactional
     public String editItemQuantity(Long cartItemId, Integer quantity) {
+        if (quantity < 1) {
+            throw new IllegalArgumentException("Quantity must be at least 1");
+        }
+        // SETS exact quantity
         CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new RuntimeException("Cart item not found with id: " + cartItemId));
+
+        // Add stock validation
+        ProductSearchResponceDto product = productService.getProductById(cartItem.getProduct().getId());
+        if (product.getQuantity() < quantity) {
+            throw new RuntimeException("Insufficient stock. Available: " + product.getQuantity());
+        }
+
         cartItem.setQuantity(quantity);
-        double price = cartItem.getPrice();
-        cartItem.setTotalPrice(price * quantity);
+        cartItem.setTotalPrice(cartItem.getPrice() * quantity);
         cartItemRepository.save(cartItem);
         return "Cart item quantity updated successfully.";
-
     }
 
 }

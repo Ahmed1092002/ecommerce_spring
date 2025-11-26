@@ -52,6 +52,7 @@ public class SecurityConfig {
 
                         // Auth endpoints
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/products/**").permitAll()
 
                         // Protected endpoints
                         .requestMatchers("/api/seller/**").hasRole("SELLER")

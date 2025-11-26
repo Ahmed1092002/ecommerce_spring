@@ -101,6 +101,7 @@ public class ProductService {
                 .stream()
                 .map(product -> {
                     ProductSearchResponceDto dto = new ProductSearchResponceDto();
+                    dto.setId(product.getId());
                     dto.setName(product.getName());
                     dto.setDescription(product.getDescription());
                     dto.setPrice(product.getPrice());
@@ -133,9 +134,19 @@ public class ProductService {
         return "Product deleted successfully : " + product.getName();
     }
 
-    public Products getProductById(Long productId) {
-        return productRepository.findById(productId)
+    public ProductSearchResponceDto getProductById(Long productId) {
+        Products product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+        ProductSearchResponceDto dto = new ProductSearchResponceDto();
+        dto.setId(product.getId());
+        dto.setName(product.getName());
+        dto.setDescription(product.getDescription());
+        dto.setPrice(product.getPrice());
+        dto.setRating(product.getRating());
+        dto.setQuantity(product.getQuantity());
+        dto.setDiscount(product.getDiscount());
+        dto.setFinalPrice(product.getFinalPrice());
+        return dto;
     }
 
     public String updateProduct(ProductUpdateDto productUpdateDto) {
@@ -155,5 +166,10 @@ public class ProductService {
         existingProduct.setFinalPrice(finalPrice);
         productRepository.save(existingProduct);
         return "Product updated successfully : " + existingProduct.getName();
+    }
+
+    public Products getProductEntityById(Long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found: " + productId));
     }
 }
