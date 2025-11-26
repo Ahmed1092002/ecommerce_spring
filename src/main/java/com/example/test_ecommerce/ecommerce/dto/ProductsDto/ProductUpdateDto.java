@@ -1,27 +1,33 @@
 package com.example.test_ecommerce.ecommerce.dto.ProductsDto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 
 @Data
 public class ProductUpdateDto {
-    @NotBlank(message = "Id is mandatory")
+    @NotNull(message = "Id is mandatory")
     private Long id;
     @NotBlank(message = "Name is mandatory")
     private String name;
     @NotBlank(message = "Description is mandatory")
     private String description;
-    @NotBlank(message = "Price is mandatory")
+    @NotNull(message = "Price is mandatory")
+    @DecimalMin(value = "0.0", message = "Price must be at least 0")
     private Double price;
-    @NotBlank(message = "Rating is mandatory")
-    @Size(min = 0, max = 5, message = "Rating must be between 0 and 5")
+    @NotNull(message = "Rating is mandatory")
+    @DecimalMin(value = "0.0", message = "Rating must be at least 0")
+    @DecimalMax(value = "5.0", message = "Rating must be at most 5")
     private Double rating;
-    @NotBlank(message = "Quantity is mandatory")
-    @Size(min = 1, message = "Quantity must be at least 1")
+    @NotNull(message = "Quantity is mandatory")
+    @Min(value = 1, message = "Quantity must be at least 1")
     private Integer quantity;
-    @NotBlank(message = "Discount is mandatory")
-    @Size(min = 0, max = 100, message = "Discount must be between 0 and 100")
+    @NotNull(message = "Discount is mandatory")
+    @DecimalMin(value = "0.0", message = "Discount must be at least 0")
+    @DecimalMax(value = "100.0", message = "Discount must be at most 100")
     private Double discount;
 
 }

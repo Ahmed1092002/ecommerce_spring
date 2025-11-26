@@ -2,6 +2,7 @@ package com.example.test_ecommerce.ecommerce.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -14,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import com.example.test_ecommerce.ecommerce.security.CustomUserDetails;
 import com.example.test_ecommerce.ecommerce.security.jwt.JwtFilter;
@@ -26,17 +28,20 @@ public class SecurityConfig {
     private final CustomUserDetails customUserDetails;
     private final JwtFilter jwtAuthenticationFilter;
     private final PasswordEncoderConfig passwordEncoderConfig;
+    private final CorsConfigurationSource corsConfigurationSource;
 
     public SecurityConfig(CustomUserDetails customUserDetails, JwtFilter jwtAuthenticationFilter,
-            PasswordEncoderConfig passwordEncoderConfig) {
+            PasswordEncoderConfig passwordEncoderConfig, CorsConfigurationSource corsConfigurationSource) {
         this.customUserDetails = customUserDetails;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.passwordEncoderConfig = passwordEncoderConfig;
+        this.corsConfigurationSource = corsConfigurationSource;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         // Swagger endpoints
@@ -49,7 +54,7 @@ public class SecurityConfig {
                                 "/configuration/**",
                                 "/webjars/**")
                         .permitAll()
-
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // Auth endpoints
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/products/**").permitAll()
@@ -61,10 +66,9 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
 
                 // IMPORTANT: jwt filter must NOT run before permitAll
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
