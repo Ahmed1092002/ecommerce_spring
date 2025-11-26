@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.example.test_ecommerce.ecommerce.Exceptions.CustomExceptions.ValidationException;
 import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductCreateDto;
 import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductSearchResponceDto;
 import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductSerchResponceMapping;
@@ -17,6 +18,7 @@ import com.example.test_ecommerce.ecommerce.entitiy.Products;
 import com.example.test_ecommerce.ecommerce.enums.UserType;
 import com.example.test_ecommerce.ecommerce.repository.ProductRepository;
 import com.example.test_ecommerce.ecommerce.utils.GetCurrentUser;
+import com.example.test_ecommerce.ecommerce.Exceptions.CustomExceptions.NotFoundException;
 
 @Service
 public class ProductService {
@@ -31,7 +33,7 @@ public class ProductService {
     public String createProduct(ProductCreateDto productCreateDto) {
         UserType currentUserRole = getCurrentUser.getCurrentUserRole();
         if (currentUserRole != UserType.SELLER) {
-            throw new RuntimeException("Only Selles users can create products.");
+            throw new ValidationException("Only Selles users can create products.");
         }
         // You can access the current user details here
         Products product = new Products();
@@ -126,17 +128,17 @@ public class ProductService {
     public String DeleteProduct(Long productId) {
         UserType currentUserRole = getCurrentUser.getCurrentUserRole();
         if (currentUserRole != UserType.SELLER) {
-            throw new RuntimeException("Only Selles users can delete products.");
+            throw new ValidationException("Only Selles users can delete products.");
         }
         Products product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+                .orElseThrow(() -> new NotFoundException("Product not found with id: " + productId));
         productRepository.delete(product);
         return "Product deleted successfully : " + product.getName();
     }
 
     public ProductSearchResponceDto getProductById(Long productId) {
         Products product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+                .orElseThrow(() -> new NotFoundException("Product not found with id: " + productId));
         ProductSearchResponceDto dto = new ProductSearchResponceDto();
         dto.setId(product.getId());
         dto.setName(product.getName());
@@ -152,9 +154,9 @@ public class ProductService {
     public String updateProduct(ProductUpdateDto productUpdateDto) {
         Long userId = getCurrentUser.getCurrentUserId();
         Products existingProduct = productRepository.findById(productUpdateDto.getId())
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productUpdateDto.getId()));
+                .orElseThrow(() -> new NotFoundException("Product not found with id: " + productUpdateDto.getId()));
         if (!existingProduct.getUser().getId().equals(userId)) {
-            throw new RuntimeException("You are not authorized to update this product.");
+            throw new ValidationException("You are not authorized to update this product.");
         }
         existingProduct.setName(productUpdateDto.getName());
         existingProduct.setDescription(productUpdateDto.getDescription());
@@ -170,6 +172,6 @@ public class ProductService {
 
     public Products getProductEntityById(Long productId) {
         return productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found: " + productId));
+                .orElseThrow(() -> new NotFoundException("Product not found: " + productId));
     }
 }

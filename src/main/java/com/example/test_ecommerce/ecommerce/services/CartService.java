@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.test_ecommerce.ecommerce.Exceptions.CustomExceptions.ProductOutOfStockException;
+import com.example.test_ecommerce.ecommerce.Exceptions.CustomExceptions.ValidationException;
 import com.example.test_ecommerce.ecommerce.dto.CartItemDto.CartItemDto;
 import com.example.test_ecommerce.ecommerce.dto.CartItemDto.CartItemDtoList;
 import com.example.test_ecommerce.ecommerce.dto.CartItemDto.CartItemsResponceDto;
@@ -54,14 +56,14 @@ public class CartService {
         Cart cart = createCart();
         ProductSearchResponceDto productDto = productService.getProductById(cartItem.getProductId());
         if (productDto.getQuantity() < cartItem.getQuantity()) {
-            throw new RuntimeException("Insufficient stock. Available: " + productDto.getQuantity());
+            throw new ProductOutOfStockException("Insufficient stock. Available: " + productDto.getQuantity());
         }
         CartItem existingItem = cartItemRepository.findByCartIdAndProductId(cart.getId(), productDto.getId());
 
         if (existingItem != null) {
             int newQuantity = existingItem.getQuantity() + cartItem.getQuantity();
             if (productDto.getQuantity() < newQuantity) {
-                throw new RuntimeException("Insufficient stock. Available: " + productDto.getQuantity());
+                throw new ProductOutOfStockException("Insufficient stock. Available: " + productDto.getQuantity());
             }
 
             existingItem.setQuantity(newQuantity);
@@ -137,10 +139,10 @@ public class CartService {
 
     public String deleteItemFromCart(Long cartItemId) {
         CartItem cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new RuntimeException("Cart item not found with id: " + cartItemId));
+                .orElseThrow(() -> new ValidationException("Cart item not found with id: " + cartItemId));
         Users currentUser = getCurrentUser.getCurrentUser();
         if (!cartItem.getCart().getUser().getId().equals(currentUser.getId())) {
-            throw new RuntimeException("Unauthorized access to cart item");
+            throw new ValidationException("Unauthorized access to cart item");
         }
         cartItemRepository.delete(cartItem);
         return "Cart item deleted successfully.";
@@ -153,12 +155,12 @@ public class CartService {
         }
         // SETS exact quantity
         CartItem cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new RuntimeException("Cart item not found with id: " + cartItemId));
+                .orElseThrow(() -> new ValidationException("Cart item not found with id: " + cartItemId));
 
         // Add stock validation
         ProductSearchResponceDto product = productService.getProductById(cartItem.getProduct().getId());
         if (product.getQuantity() < quantity) {
-            throw new RuntimeException("Insufficient stock. Available: " + product.getQuantity());
+            throw new ProductOutOfStockException("Insufficient stock. Available: " + product.getQuantity());
         }
 
         cartItem.setQuantity(quantity);
