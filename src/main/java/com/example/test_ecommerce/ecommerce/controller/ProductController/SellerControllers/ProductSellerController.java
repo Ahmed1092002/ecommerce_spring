@@ -1,5 +1,8 @@
 package com.example.test_ecommerce.ecommerce.controller.ProductController.SellerControllers;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,7 +33,8 @@ public class ProductSellerController {
     }
 
     @PostMapping("/CreateProduct")
-    public ResponseEntity<String> createProduct(@Valid @RequestBody ProductCreateDto productCreateDto) {
+    public ResponseEntity<HashMap<String, Object>> createProduct(
+            @Valid @RequestBody ProductCreateDto productCreateDto) {
         return ResponseEntity.ok(productService.createProduct(productCreateDto));
     }
 

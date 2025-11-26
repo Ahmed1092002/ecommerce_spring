@@ -1,6 +1,8 @@
 package com.example.test_ecommerce.ecommerce.services;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -30,7 +32,7 @@ public class ProductService {
         this.getCurrentUser = getCurrentUser;
     }
 
-    public String createProduct(ProductCreateDto productCreateDto) {
+    public Map<String, Object> createProduct(ProductCreateDto productCreateDto) {
         UserType currentUserRole = getCurrentUser.getCurrentUserRole();
         if (currentUserRole != UserType.SELLER) {
             throw new ValidationException("Only Selles users can create products.");
@@ -48,8 +50,11 @@ public class ProductService {
         double discountAmount = (productCreateDto.getDiscount() / 100) * productCreateDto.getPrice();
         product.setFinalPrice(productCreateDto.getPrice() - discountAmount);
         Products createdProduct = productRepository.save(product);
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("message", "Product created successfully");
+        response.put("product", createdProduct);
 
-        return "Product created successfully : " + createdProduct.getName();
+        return response;
 
     }
 
