@@ -16,10 +16,6 @@ public class ProductCreateDto {
     @NotNull(message = "Price is mandatory")
     @DecimalMin(value = "0.0", message = "Price must be at least 0")
     private Double price;
-    @NotNull(message = "Rating is mandatory")
-    @DecimalMin(value = "0.0", message = "Rating must be at least 0")
-    @DecimalMax(value = "5.0", message = "Rating must be at most 5")
-    private Double rating;
     @NotNull(message = "Quantity is mandatory")
     @Min(value = 1, message = "Quantity must be at least 1")
     private Integer quantity;

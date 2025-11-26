@@ -42,17 +42,15 @@ public class ProductService {
         product.setName(productCreateDto.getName());
         product.setDescription(productCreateDto.getDescription());
         product.setPrice(productCreateDto.getPrice());
-        product.setRating(productCreateDto.getRating());
         product.setQuantity(productCreateDto.getQuantity());
         product.setUser(getCurrentUser.getCurrentUser());
         product.setDiscount(productCreateDto.getDiscount());
 
         double discountAmount = (productCreateDto.getDiscount() / 100) * productCreateDto.getPrice();
         product.setFinalPrice(productCreateDto.getPrice() - discountAmount);
-        Products createdProduct = productRepository.save(product);
+        productRepository.save(product);
         HashMap<String, Object> response = new HashMap<>();
         response.put("message", "Product created successfully");
-        response.put("product", createdProduct);
 
         return response;
 
@@ -112,7 +110,6 @@ public class ProductService {
                     dto.setName(product.getName());
                     dto.setDescription(product.getDescription());
                     dto.setPrice(product.getPrice());
-                    dto.setRating(product.getRating());
                     dto.setQuantity(product.getQuantity());
                     dto.setDiscount(product.getDiscount());
                     dto.setFinalPrice(product.getFinalPrice());
@@ -149,7 +146,6 @@ public class ProductService {
         dto.setName(product.getName());
         dto.setDescription(product.getDescription());
         dto.setPrice(product.getPrice());
-        dto.setRating(product.getRating());
         dto.setQuantity(product.getQuantity());
         dto.setDiscount(product.getDiscount());
         dto.setFinalPrice(product.getFinalPrice());
@@ -166,7 +162,6 @@ public class ProductService {
         existingProduct.setName(productUpdateDto.getName());
         existingProduct.setDescription(productUpdateDto.getDescription());
         existingProduct.setPrice(productUpdateDto.getPrice());
-        existingProduct.setRating(productUpdateDto.getRating());
         existingProduct.setQuantity(productUpdateDto.getQuantity());
         existingProduct.setDiscount(productUpdateDto.getDiscount());
         double finalPrice = calculateFinalPrice(productUpdateDto.getPrice(), productUpdateDto.getDiscount());

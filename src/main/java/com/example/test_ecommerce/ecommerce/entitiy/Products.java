@@ -32,7 +32,7 @@ public class Products {
     @Column(nullable = false)
     private Double price;
 
-    private Double rating;
+
 
     @Column(nullable = false)
     private Double discount;

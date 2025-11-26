@@ -33,7 +33,7 @@ public class ProductSellerController {
     }
 
     @PostMapping("/CreateProduct")
-    public ResponseEntity<HashMap<String, Object>> createProduct(
+    public ResponseEntity<Map<String, Object>> createProduct(
             @Valid @RequestBody ProductCreateDto productCreateDto) {
         return ResponseEntity.ok(productService.createProduct(productCreateDto));
     }

@@ -8,7 +8,6 @@ public class ProductSearchResponceDto {
     private String name;
     private String description;
     private Double price;
-    private Double rating;
     private Integer quantity;
     private Double discount;
     private Double finalPrice;
