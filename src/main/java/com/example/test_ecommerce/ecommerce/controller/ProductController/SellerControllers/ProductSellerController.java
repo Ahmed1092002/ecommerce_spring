@@ -57,8 +57,8 @@ public class ProductSellerController {
     }
 
     @PutMapping("/updateproduct")
-    public String updateProduct(@Valid @RequestBody ProductUpdateDto entity) {
+    public ResponseEntity<Map<String, Object>> updateProduct(@Valid @RequestBody ProductUpdateDto entity) {
 
-        return ResponseEntity.ok(productService.updateProduct(entity)).getBody();
+        return ResponseEntity.ok(productService.updateProduct(entity));
     }
 }

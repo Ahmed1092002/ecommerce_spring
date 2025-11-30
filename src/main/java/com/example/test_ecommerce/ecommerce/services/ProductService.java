@@ -152,7 +152,7 @@ public class ProductService {
         return dto;
     }
 
-    public String updateProduct(ProductUpdateDto productUpdateDto) {
+    public HashMap<String, Object> updateProduct(ProductUpdateDto productUpdateDto) {
         Long userId = getCurrentUser.getCurrentUserId();
         Products existingProduct = productRepository.findById(productUpdateDto.getId())
                 .orElseThrow(() -> new NotFoundException("Product not found with id: " + productUpdateDto.getId()));
@@ -167,7 +167,10 @@ public class ProductService {
         double finalPrice = calculateFinalPrice(productUpdateDto.getPrice(), productUpdateDto.getDiscount());
         existingProduct.setFinalPrice(finalPrice);
         productRepository.save(existingProduct);
-        return "Product updated successfully : " + existingProduct.getName();
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("message", "Product updated successfully");
+
+        return response;
     }
 
     public Products getProductEntityById(Long productId) {
