@@ -152,8 +152,8 @@ public class CartService {
 
     @Transactional
     public String editItemQuantity(Long cartItemId, Integer quantity) {
-        if (quantity < 1) {
-            throw new IllegalArgumentException("Quantity must be at least 1");
+        if (quantity <= 0) {
+            return deleteItemFromCart(cartItemId);
         }
         // SETS exact quantity
         CartItem cartItem = cartItemRepository.findById(cartItemId)
@@ -169,6 +169,19 @@ public class CartService {
         cartItem.setTotalPrice(cartItem.getPrice().multiply(new BigDecimal(quantity)));
         cartItemRepository.save(cartItem);
         return "Cart item quantity updated successfully.";
+    }
+
+    @Transactional
+    public String clearCart() {
+        Users user = getCurrentUser.getCurrentUser();
+        Cart cart = cartRepository.findByUserId(user.getId());
+
+        if (cart != null) {
+            List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getId());
+            cartItemRepository.deleteAll(cartItems);
+            return "Cart cleared successfully.";
+        }
+        return "Cart is already empty.";
     }
 
 }

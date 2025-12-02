@@ -1,5 +1,7 @@
 package com.example.test_ecommerce.ecommerce.controller;
 
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -41,8 +43,8 @@ public class CartController {
     @PatchMapping("/update/{cartItemId}")
     public ResponseEntity<String> updateQuantity(
             @PathVariable Long cartItemId,
-            @RequestParam Integer quantity) {
-        String message = cartService.editItemQuantity(cartItemId, quantity);
+            @Valid @RequestBody Map<String, Integer> cartItem) {
+        String message = cartService.editItemQuantity(cartItemId, cartItem.get("quantity"));
         return ResponseEntity.ok(message);
     }
 
@@ -51,5 +53,11 @@ public class CartController {
         String message = cartService.deleteItemFromCart(cartItemId);
         return ResponseEntity.ok(message);
     }
-    
+
+    @DeleteMapping("/clear")
+    public ResponseEntity<String> clearCart() {
+        String message = cartService.clearCart();
+        return ResponseEntity.ok(message);
+    }
+
 }
