@@ -1,5 +1,6 @@
 package com.example.test_ecommerce.ecommerce.services;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -67,11 +68,11 @@ public class CartService {
             }
 
             existingItem.setQuantity(newQuantity);
-            existingItem.setTotalPrice(existingItem.getPrice() * existingItem.getQuantity());
+            existingItem.setTotalPrice(existingItem.getPrice().multiply(new BigDecimal(existingItem.getQuantity())));
             cartItemRepository.save(existingItem);
             return "Item quantity updated successfully.";
         } else {
-            double price = productService.calculateFinalPrice(
+            BigDecimal price = productService.calculateFinalPrice(
                     productDto.getPrice(),
                     productDto.getDiscount());
             Products product = productService.getProductEntityById(cartItem.getProductId());
@@ -81,7 +82,7 @@ public class CartService {
             newCartItem.setProduct(product);
             newCartItem.setPrice(price);
             newCartItem.setQuantity(cartItem.getQuantity());
-            newCartItem.setTotalPrice(price * cartItem.getQuantity());
+            newCartItem.setTotalPrice(price.multiply(new BigDecimal(cartItem.getQuantity())));
 
             cartItemRepository.save(newCartItem);
             return "Item added to cart successfully.";
@@ -97,9 +98,9 @@ public class CartService {
         if (cart == null) {
             responseDto.setCartItems(List.of());
             responseDto.setTotalItems(0);
-            responseDto.setTotalCartPrice(0.0);
+            responseDto.setTotalCartPrice(new BigDecimal(0));
             responseDto.setTotalQuantity(0);
-            responseDto.setTotalDiscount(0.0);
+            responseDto.setTotalDiscount(new BigDecimal(0));
             return responseDto;
         }
         List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getId());
@@ -116,20 +117,21 @@ public class CartService {
 
         responseDto.setCartItems(responceDtos);
         responseDto.setTotalItems(responceDtos.size());
-        double totalPrice = responceDtos.stream()
-                .mapToDouble((item) -> item.getTotalPrice())
-                .sum();
+        BigDecimal totalPrice = responceDtos.stream()
+                .map((item) -> item.getTotalPrice())
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
         responseDto.setTotalCartPrice(totalPrice);
         int totalQuantity = responceDtos.stream()
                 .mapToInt((item) -> item.getQuantity())
                 .sum();
         responseDto.setTotalQuantity(totalQuantity);
-        double totalDiscount = cartItems.stream()
-                .mapToDouble((item) -> {
-                    double originalPrice = item.getProduct().getPrice() * item.getQuantity();
-                    return originalPrice - item.getTotalPrice();
+        BigDecimal totalDiscount = cartItems.stream()
+                .map((item) -> {
+                    BigDecimal originalPrice = item.getProduct().getPrice()
+                            .multiply(new BigDecimal(item.getQuantity()));
+                    return originalPrice.subtract(item.getTotalPrice());
                 })
-                .sum();
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
         responseDto.setTotalDiscount(totalDiscount);
 
         return responseDto;
@@ -164,7 +166,7 @@ public class CartService {
         }
 
         cartItem.setQuantity(quantity);
-        cartItem.setTotalPrice(cartItem.getPrice() * quantity);
+        cartItem.setTotalPrice(cartItem.getPrice().multiply(new BigDecimal(quantity)));
         cartItemRepository.save(cartItem);
         return "Cart item quantity updated successfully.";
     }

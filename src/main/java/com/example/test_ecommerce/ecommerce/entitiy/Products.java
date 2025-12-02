@@ -1,5 +1,6 @@
 package com.example.test_ecommerce.ecommerce.entitiy;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 import jakarta.persistence.Column;
@@ -30,15 +31,15 @@ public class Products {
     @Column(nullable = false)
     private String description;
     @Column(nullable = false)
-    private Double price;
+    private BigDecimal price;
 
 
 
     @Column(nullable = false)
-    private Double discount;
+    private BigDecimal  discount;
 
     @Column(nullable = false)
-    private double finalPrice;
+    private BigDecimal finalPrice;
 
     @Column(nullable = false)
     private Integer quantity;

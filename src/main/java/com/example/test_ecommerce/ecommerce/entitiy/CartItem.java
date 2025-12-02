@@ -1,5 +1,6 @@
 package com.example.test_ecommerce.ecommerce.entitiy;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -32,10 +33,10 @@ public class CartItem {
     private Integer quantity;
 
     @Column(nullable = false)
-    private Double price;
+    private BigDecimal price;
 
     @Column(nullable = false)
-    private Double totalPrice;
+    private BigDecimal totalPrice;
 
 
 }

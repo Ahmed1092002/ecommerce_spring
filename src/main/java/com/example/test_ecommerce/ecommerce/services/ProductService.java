@@ -1,5 +1,6 @@
 package com.example.test_ecommerce.ecommerce.services;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,8 +47,8 @@ public class ProductService {
         product.setUser(getCurrentUser.getCurrentUser());
         product.setDiscount(productCreateDto.getDiscount());
 
-        double discountAmount = (productCreateDto.getDiscount() / 100) * productCreateDto.getPrice();
-        product.setFinalPrice(productCreateDto.getPrice() - discountAmount);
+        BigDecimal discountAmount = productCreateDto.getDiscount().divide(new BigDecimal(100)).multiply(productCreateDto.getPrice());
+        product.setFinalPrice(productCreateDto.getPrice().subtract(discountAmount));
         productRepository.save(product);
         HashMap<String, Object> response = new HashMap<>();
         response.put("message", "Product created successfully");
@@ -56,9 +57,9 @@ public class ProductService {
 
     }
 
-    public double calculateFinalPrice(double price, double discount) {
-        double discountAmount = (discount / 100) * price;
-        return price - discountAmount;
+    public BigDecimal calculateFinalPrice(BigDecimal price, BigDecimal discount) {
+        BigDecimal discountAmount = discount.divide(new BigDecimal(100)).multiply(price);
+        return price.subtract(discountAmount);
     }
 
     public ProductSerchResponceMapping getProductsPaginationWithAscending(int page, int size, String sortedColumn,
@@ -164,7 +165,7 @@ public class ProductService {
         existingProduct.setPrice(productUpdateDto.getPrice());
         existingProduct.setQuantity(productUpdateDto.getQuantity());
         existingProduct.setDiscount(productUpdateDto.getDiscount());
-        double finalPrice = calculateFinalPrice(productUpdateDto.getPrice(), productUpdateDto.getDiscount());
+        BigDecimal finalPrice = calculateFinalPrice(productUpdateDto.getPrice(), productUpdateDto.getDiscount());
         existingProduct.setFinalPrice(finalPrice);
         productRepository.save(existingProduct);
         HashMap<String, Object> response = new HashMap<>();
