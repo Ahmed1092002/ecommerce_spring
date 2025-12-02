@@ -22,11 +22,7 @@ public class CustomUserDetails implements UserDetailsService {
     public UserDetails loadUserByUsername(String login) {
         Users user = userRepository.findByUsernameOrEmail(login, login)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + login));
-        return org.springframework.security.core.userdetails.User
-        .withUsername(user.getUsername())
-                .password(user.getPassword())
-                .authorities(user.getAuthorities())
-                .build();
+        return user;
     }
 
 }

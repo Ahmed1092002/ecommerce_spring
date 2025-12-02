@@ -22,9 +22,9 @@ public class GetCurrentUser {
     // Returns full Users entity
     public Users getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+        Users user = (Users) authentication.getPrincipal();
+        return userRepository.findById(user.getId())
+                .orElseThrow(() -> new RuntimeException("User not found: " + user.getUsername()));
     }
 
     public String getCurrentUsername() {
