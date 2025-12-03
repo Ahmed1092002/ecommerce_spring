@@ -33,10 +33,8 @@ public class Products {
     @Column(nullable = false)
     private BigDecimal price;
 
-
-
     @Column(nullable = false)
-    private BigDecimal  discount;
+    private BigDecimal discount;
 
     @Column(nullable = false)
     private BigDecimal finalPrice;
@@ -49,8 +47,8 @@ public class Products {
     private Date createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private Users user;
+    @JoinColumn(name = "seller_profile_id", nullable = false)
+    private SellerProfile sellerProfile;
 
     @PrePersist
     protected void onCreate() {
@@ -59,4 +57,3 @@ public class Products {
         }
     }
 }
-

@@ -44,7 +44,7 @@ public class ProductService {
         product.setDescription(productCreateDto.getDescription());
         product.setPrice(productCreateDto.getPrice());
         product.setQuantity(productCreateDto.getQuantity());
-        product.setUser(getCurrentUser.getCurrentUser());
+        product.setSellerProfile(getCurrentUser.getCurrentUser().getSellerProfile());
         product.setDiscount(productCreateDto.getDiscount());
 
         BigDecimal discountAmount = productCreateDto.getDiscount().divide(new BigDecimal(100)).multiply(productCreateDto.getPrice());
@@ -75,7 +75,7 @@ public class ProductService {
         Sort sort = ascending ? Sort.by(sortedColumn).ascending() : Sort.by(sortedColumn).descending();
 
         Pageable pageable = PageRequest.of(page - 1, size, sort);
-        Page<Products> result = productRepository.findByUser_IdAndNameContainingIgnoreCaseAndPriceBetween(userId, name,
+        Page<Products> result = productRepository.findBySellerProfile_IdAndNameContainingIgnoreCaseAndPriceBetween(userId, name,
                 minPrice, maxPrice,
                 pageable);
 
@@ -157,7 +157,7 @@ public class ProductService {
         Long userId = getCurrentUser.getCurrentUserId();
         Products existingProduct = productRepository.findById(productUpdateDto.getId())
                 .orElseThrow(() -> new NotFoundException("Product not found with id: " + productUpdateDto.getId()));
-        if (!existingProduct.getUser().getId().equals(userId)) {
+        if (!existingProduct.getSellerProfile().getUser().getId().equals(userId)) {
             throw new ValidationException("You are not authorized to update this product.");
         }
         existingProduct.setName(productUpdateDto.getName());

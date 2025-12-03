@@ -9,11 +9,11 @@ import com.example.test_ecommerce.ecommerce.enums.CartStatus;
 @Repository
 public interface CartRepository extends JpaRepository<Cart, Long> {
 
-    public Cart findByUserIdAndStatus(Long userId, CartStatus status);
+    Cart findByCustomerProfile_IdAndStatus(Long customerProfileId, CartStatus status);
 
-    public Cart findByUserIdAndStatusNot(Long userId, CartStatus status);
+    Cart findByCustomerProfile_IdAndStatusNot(Long customerProfileId, CartStatus status);
 
-    public Cart findByUserId(Long userId);
+    Cart findByCustomerProfile_Id(Long customerProfileId);
 
     public void deleteById(Long id);
 

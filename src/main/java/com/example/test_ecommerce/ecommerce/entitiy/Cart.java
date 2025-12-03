@@ -28,8 +28,8 @@ public class Cart {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private Users user;
+    @JoinColumn(name = "customer_profile_id", nullable = false)
+    private CustomerProfile customerProfile;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

@@ -19,6 +19,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import lombok.Data;
 
 @Entity
@@ -38,11 +39,14 @@ public class Users implements UserDetails {
     @Column(nullable = false)
     private UserType userType;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Products> products = new ArrayList<>();
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private CustomerProfile customerProfile;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private SellerProfile sellerProfile;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Cart> carts = new ArrayList<>();
+    private List<Address> addresses = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

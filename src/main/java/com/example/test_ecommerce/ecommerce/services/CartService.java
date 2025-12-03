@@ -39,11 +39,11 @@ public class CartService {
     public Cart createCart() {
 
         Users user = getCurrentUser.getCurrentUser();
-        Cart cart = cartRepository.findByUserId(user.getId());
+        Cart cart = cartRepository.findByCustomerProfile_Id(user.getId());
 
         if (cart == null) {
             cart = new Cart();
-            cart.setUser(user);
+            cart.setCustomerProfile(user.getCustomerProfile());
             cart.setStatus(CartStatus.ACTIVE);
 
             cart = cartRepository.save(cart);
@@ -92,7 +92,7 @@ public class CartService {
 
     public CartItemsResponceDto getCart() {
         Users user = getCurrentUser.getCurrentUser();
-        Cart cart = cartRepository.findByUserId(user.getId());
+        Cart cart = cartRepository.findByCustomerProfile_Id(user.getId());
         CartItemsResponceDto responseDto = new CartItemsResponceDto();
 
         if (cart == null) {
@@ -143,7 +143,7 @@ public class CartService {
         CartItem cartItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new ValidationException("Cart item not found with id: " + cartItemId));
         Users currentUser = getCurrentUser.getCurrentUser();
-        if (!cartItem.getCart().getUser().getId().equals(currentUser.getId())) {
+        if (!cartItem.getCart().getCustomerProfile().getUser().getId().equals(currentUser.getId())) {
             throw new ValidationException("Unauthorized access to cart item");
         }
         cartItemRepository.delete(cartItem);
@@ -174,7 +174,7 @@ public class CartService {
     @Transactional
     public String clearCart() {
         Users user = getCurrentUser.getCurrentUser();
-        Cart cart = cartRepository.findByUserId(user.getId());
+        Cart cart = cartRepository.findByCustomerProfile_Id(user.getId());
 
         if (cart != null) {
             List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getId());
