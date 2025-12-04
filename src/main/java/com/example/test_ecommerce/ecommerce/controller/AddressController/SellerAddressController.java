@@ -78,4 +78,14 @@ public class SellerAddressController {
     public ResponseEntity<AddressResponse> deleteAddress(@PathVariable Long id) {
         return ResponseEntity.ok(addressService.removeSellerAddress(id));
     }
+
+    /**
+     * Get the default address for the current seller
+     * GET /api/seller/addresses/default
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<AddressResponse> getAddressById(@PathVariable Long id) {
+        return ResponseEntity.ok(addressService.getSellerAddressById(id));
+    }
+
 }

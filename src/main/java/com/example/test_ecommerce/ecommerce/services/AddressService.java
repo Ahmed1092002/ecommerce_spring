@@ -19,7 +19,8 @@ import com.example.test_ecommerce.ecommerce.enums.AddressType;
 import com.example.test_ecommerce.ecommerce.enums.UserType;
 import com.example.test_ecommerce.ecommerce.repository.AddressRepository;
 import com.example.test_ecommerce.ecommerce.utils.GetCurrentUser;
-
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 @Service
 public class AddressService {
     private final AddressRepository addressRepository;
@@ -171,8 +172,11 @@ public class AddressService {
         response.setTotalElements(addresses.getTotalElements());
         response.setTotalPages(addresses.getTotalPages());
 
-        addresses.forEach(address -> response.getData().add(createAddressResponse(address)));
-        return response;
+        response.setData(addresses.stream().map(address -> {
+            AddressResponse addressResponse = createAddressResponse(address);
+            return addressResponse;
+        }).collect(Collectors.toList()));      
+          return response;
     }
 
     public AddressResponse getCustomerAddressById(Long addressId) {
@@ -243,6 +247,14 @@ public class AddressService {
         return response;
     }
 
+    public AddressResponse getSellerAddressById(Long userId) {
+        Users user = getCurrentUser.getCurrentUser();
+
+        validateUserType(user, UserType.SELLER, "get addresses");
+        Address address = getAddressWithOwnershipCheck(userId, user);
+        return createAddressResponse(address);
+    }
+
     @Transactional
     public AddressResponse setDefaultSellerAddress(Long addressId) {
         Users user = getCurrentUser.getCurrentUser();
@@ -269,8 +281,9 @@ public class AddressService {
         response.setPageSize(addresses.getSize());
         response.setTotalPages(addresses.getTotalPages());
         response.setTotalElements(addresses.getTotalElements());
-
-        addresses.forEach(address -> response.getData().add(createAddressResponse(address)));
-        return response;
+        List<AddressResponse> addressResponseList = new ArrayList<>();
+        addresses.forEach(address -> addressResponseList.add(createAddressResponse(address)));
+        response.setData(addressResponseList);
+       return response;
     }
 }
