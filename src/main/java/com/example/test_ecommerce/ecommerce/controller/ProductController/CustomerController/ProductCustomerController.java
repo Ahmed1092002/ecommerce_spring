@@ -13,9 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.test_ecommerce.ecommerce.services.ProductService;
-import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductCreateDto;
-import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductSerchResponceMapping;
-import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductUpdateDto;
+import com.example.test_ecommerce.ecommerce.dto.GenericPageResponse.GenericPageResponse;
+import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductSearchResponceDto;
 
 import jakarta.validation.Valid;
 
@@ -30,7 +29,7 @@ public class ProductCustomerController {
     }
 
     @GetMapping("/GetProducts")
-    public ResponseEntity<ProductSerchResponceMapping> getPublicCustomerProductsPaginationWithAscending(
+    public ResponseEntity<GenericPageResponse<ProductSearchResponceDto>> getPublicCustomerProductsPaginationWithAscending(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortedColumn,

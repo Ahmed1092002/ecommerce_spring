@@ -1,14 +1,17 @@
-package com.example.test_ecommerce.ecommerce.dto.ProductsDto;
+package com.example.test_ecommerce.ecommerce.dto.GenericPageResponse;
 
 import java.util.List;
 
 import lombok.Data;
 
 @Data
-public class ProductSerchResponceMapping {
+public class GenericPageResponse<T> {
     private int pageNumber;
     private int pageSize;
     private int totalPages;
     private long totalElements;
-    private List<ProductSearchResponceDto> data;
+    private List<T> data;
+
+
+    
 }

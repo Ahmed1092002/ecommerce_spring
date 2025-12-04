@@ -3,7 +3,7 @@ package com.example.test_ecommerce.ecommerce.dto.ProductsDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.DecimalMin;
-
+import com.example.test_ecommerce.ecommerce.entitiy.Products;
 import java.math.BigDecimal;
 
 import jakarta.validation.constraints.DecimalMax;
@@ -26,4 +26,13 @@ public class ProductCreateDto {
     @DecimalMin(value = "0.0", message = "Discount must be at least 0")
     @DecimalMax(value = "100.0", message = "Discount must be at most 100")
     private BigDecimal discount;
+    public Products toProduct() {
+        Products product = new Products();
+        product.setName(this.name);
+        product.setDescription(this.description);
+        product.setPrice(this.price);
+        product.setQuantity(this.quantity);
+        product.setDiscount(this.discount);
+        return product;
+    }
 }

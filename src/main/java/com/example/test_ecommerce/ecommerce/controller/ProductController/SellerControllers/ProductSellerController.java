@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductCreateDto;
-import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductSerchResponceMapping;
+import com.example.test_ecommerce.ecommerce.dto.GenericPageResponse.GenericPageResponse;
+import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductSearchResponceDto;
 import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductUpdateDto;
 import com.example.test_ecommerce.ecommerce.services.ProductService;
 
@@ -39,7 +40,7 @@ public class ProductSellerController {
     }
 
     @GetMapping("/GetProducts")
-    public ResponseEntity<ProductSerchResponceMapping> getSellerProductsPaginationWithAscending(
+    public ResponseEntity<GenericPageResponse<ProductSearchResponceDto>> getSellerProductsPaginationWithAscending(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "id") String sortedColumn,

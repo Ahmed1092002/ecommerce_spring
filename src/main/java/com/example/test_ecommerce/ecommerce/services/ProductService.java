@@ -15,13 +15,13 @@ import org.springframework.stereotype.Service;
 import com.example.test_ecommerce.ecommerce.Exceptions.CustomExceptions.ValidationException;
 import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductCreateDto;
 import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductSearchResponceDto;
-import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductSerchResponceMapping;
 import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductUpdateDto;
 import com.example.test_ecommerce.ecommerce.entitiy.Products;
 import com.example.test_ecommerce.ecommerce.enums.UserType;
 import com.example.test_ecommerce.ecommerce.repository.ProductRepository;
 import com.example.test_ecommerce.ecommerce.utils.GetCurrentUser;
 import com.example.test_ecommerce.ecommerce.Exceptions.CustomExceptions.NotFoundException;
+import com.example.test_ecommerce.ecommerce.dto.GenericPageResponse.GenericPageResponse;
 
 @Service
 public class ProductService {
@@ -39,16 +39,11 @@ public class ProductService {
             throw new ValidationException("Only Selles users can create products.");
         }
         // You can access the current user details here
-        Products product = new Products();
-        product.setName(productCreateDto.getName());
-        product.setDescription(productCreateDto.getDescription());
-        product.setPrice(productCreateDto.getPrice());
-        product.setQuantity(productCreateDto.getQuantity());
+        Products product = productCreateDto.toProduct();
         product.setSellerProfile(getCurrentUser.getCurrentUser().getSellerProfile());
-        product.setDiscount(productCreateDto.getDiscount());
 
-        BigDecimal discountAmount = productCreateDto.getDiscount().divide(new BigDecimal(100)).multiply(productCreateDto.getPrice());
-        product.setFinalPrice(productCreateDto.getPrice().subtract(discountAmount));
+        BigDecimal finalPrice = calculateFinalPrice(productCreateDto.getPrice(), productCreateDto.getDiscount());
+        product.setFinalPrice(finalPrice);
         productRepository.save(product);
         HashMap<String, Object> response = new HashMap<>();
         response.put("message", "Product created successfully");
@@ -62,20 +57,22 @@ public class ProductService {
         return price.subtract(discountAmount);
     }
 
-    public ProductSerchResponceMapping getProductsPaginationWithAscending(int page, int size, String sortedColumn,
+    public GenericPageResponse<ProductSearchResponceDto> getProductsPaginationWithAscending(int page, int size,
+            String sortedColumn,
             String name,
             double minPrice,
             double maxPrice,
             boolean ascending) {
         Long userId = getCurrentUser.getCurrentUserId();
-        if (page == 0) {
+        if (page == 0 || page < 0) {
             throw new IllegalArgumentException("Page index must be greater than 0");
         }
 
         Sort sort = ascending ? Sort.by(sortedColumn).ascending() : Sort.by(sortedColumn).descending();
 
         Pageable pageable = PageRequest.of(page - 1, size, sort);
-        Page<Products> result = productRepository.findBySellerProfile_IdAndNameContainingIgnoreCaseAndPriceBetween(userId, name,
+        Page<Products> result = productRepository.findBySellerProfile_IdAndNameContainingIgnoreCaseAndPriceBetween(
+                userId, name,
                 minPrice, maxPrice,
                 pageable);
 
@@ -83,12 +80,13 @@ public class ProductService {
 
     }
 
-    public ProductSerchResponceMapping getPublicProductsPaginationWithAscending(int page, int size, String sortedColumn,
+    public GenericPageResponse<ProductSearchResponceDto> getPublicProductsPaginationWithAscending(int page, int size,
+            String sortedColumn,
             String name,
             double minPrice,
             double maxPrice,
             boolean ascending) {
-        if (page == 0) {
+        if (page == 0 || page < 0) {
             throw new IllegalArgumentException("Page index must be greater than 0");
         }
 
@@ -101,24 +99,20 @@ public class ProductService {
 
     }
 
-    private ProductSerchResponceMapping mapToProductSearchResponceDto(Page<Products> result, int page, int size) {
+    private GenericPageResponse<ProductSearchResponceDto> mapToProductSearchResponceDto(Page<Products> result, int page,
+            int size) {
 
         List<ProductSearchResponceDto> productSearchResponceDtos = result.getContent()
                 .stream()
                 .map(product -> {
                     ProductSearchResponceDto dto = new ProductSearchResponceDto();
-                    dto.setId(product.getId());
-                    dto.setName(product.getName());
-                    dto.setDescription(product.getDescription());
-                    dto.setPrice(product.getPrice());
-                    dto.setQuantity(product.getQuantity());
-                    dto.setDiscount(product.getDiscount());
-                    dto.setFinalPrice(product.getFinalPrice());
+                    dto.fromEntity(product);
+
                     return dto;
                 })
                 .collect(Collectors.toList());
 
-        ProductSerchResponceMapping mapping = new ProductSerchResponceMapping();
+        GenericPageResponse<ProductSearchResponceDto> mapping = new GenericPageResponse<>();
         mapping.setPageNumber(result.getNumber() + 1); // مهم جدًا
         mapping.setPageSize(result.getSize());
         mapping.setTotalElements(result.getTotalElements());
@@ -143,12 +137,7 @@ public class ProductService {
         Products product = productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundException("Product not found with id: " + productId));
         ProductSearchResponceDto dto = new ProductSearchResponceDto();
-        dto.setId(product.getId());
-        dto.setName(product.getName());
-        dto.setDescription(product.getDescription());
-        dto.setPrice(product.getPrice());
-        dto.setQuantity(product.getQuantity());
-        dto.setDiscount(product.getDiscount());
+        dto.fromEntity(product);
         dto.setFinalPrice(product.getFinalPrice());
         return dto;
     }

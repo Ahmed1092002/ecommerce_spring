@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductCreateDto;
 import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductSearchResponceDto;
-import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductSerchResponceMapping;
 import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductUpdateDto;
 import com.example.test_ecommerce.ecommerce.services.ProductService;
 
