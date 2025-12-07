@@ -106,12 +106,7 @@ public class CartService {
         List<CartItem> cartItems = cartItemRepository.findByCartId(cart.getId());
         List<CartItemDtoList> responceDtos = cartItems.stream().map(item -> {
             CartItemDtoList dto = new CartItemDtoList();
-            dto.setCartItemId(item.getId());
-            dto.setProductId(item.getProduct().getId());
-            dto.setName(item.getProduct().getName());
-            dto.setQuantity(item.getQuantity());
-            dto.setPrice(item.getPrice());
-            dto.setTotalPrice(item.getTotalPrice());
+            dto.fromCartItem(item);
             return dto;
         }).toList();
 

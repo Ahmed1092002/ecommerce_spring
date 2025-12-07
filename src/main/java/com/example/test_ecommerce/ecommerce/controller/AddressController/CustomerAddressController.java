@@ -83,7 +83,7 @@ public class CustomerAddressController {
      * Set an address as default
      * PATCH /api/customer/addresses/{id}/default
      */
-    @PatchMapping("/{id}/default")
+    @PutMapping("/{id}/default")
     public ResponseEntity<AddressResponse> setDefaultAddress(@PathVariable Long id) {
         return ResponseEntity.ok(addressService.setCustomerAddressDefault(id));
     }

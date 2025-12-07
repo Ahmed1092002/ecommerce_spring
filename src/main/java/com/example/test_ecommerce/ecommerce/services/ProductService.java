@@ -122,15 +122,19 @@ public class ProductService {
         return mapping;
     }
 
-    public String DeleteProduct(Long productId) {
+    @SuppressWarnings("null")
+    public HashMap<String, Object> DeleteProduct(Long productId) {
         UserType currentUserRole = getCurrentUser.getCurrentUserRole();
         if (currentUserRole != UserType.SELLER) {
             throw new ValidationException("Only Selles users can delete products.");
         }
+
         Products product = productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundException("Product not found with id: " + productId));
         productRepository.delete(product);
-        return "Product deleted successfully : " + product.getName();
+        HashMap<String, Object> response = new HashMap<>();
+        response.put("message", "Product deleted successfully : " + product.getName());
+        return response;
     }
 
     public ProductSearchResponceDto getProductById(Long productId) {
@@ -154,6 +158,7 @@ public class ProductService {
         existingProduct.setPrice(productUpdateDto.getPrice());
         existingProduct.setQuantity(productUpdateDto.getQuantity());
         existingProduct.setDiscount(productUpdateDto.getDiscount());
+        existingProduct.setImage(productUpdateDto.getImage());
         BigDecimal finalPrice = calculateFinalPrice(productUpdateDto.getPrice(), productUpdateDto.getDiscount());
         existingProduct.setFinalPrice(finalPrice);
         productRepository.save(existingProduct);

@@ -10,6 +10,7 @@ import lombok.Data;
 public class ProductSearchResponceDto {
     private Long id;
     private String name;
+    private String image;
     private String description;
     private BigDecimal price;
     private Integer quantity;
@@ -19,6 +20,7 @@ public class ProductSearchResponceDto {
     public void fromEntity(Products product) {
         this.id = product.getId();
         this.name = product.getName();
+        this.image = product.getImage();
         this.description = product.getDescription();
         this.price = product.getPrice();
         this.quantity = product.getQuantity();

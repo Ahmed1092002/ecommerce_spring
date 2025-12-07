@@ -25,6 +25,7 @@ public class Products {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
+    
     private Long id;
     @Column(nullable = false)
     private String name;
@@ -49,7 +50,9 @@ public class Products {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_profile_id", nullable = false)
     private SellerProfile sellerProfile;
-
+    
+    private String image;
+    
     @PrePersist
     protected void onCreate() {
         if (this.createdAt == null) {

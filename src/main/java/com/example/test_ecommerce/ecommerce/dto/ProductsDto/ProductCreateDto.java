@@ -12,13 +12,15 @@ import lombok.Data;
 
 @Data
 public class ProductCreateDto {
+    @NotNull(message = "Image is mandatory")
+    private String image;
     @NotBlank(message = "Name is mandatory")
     private String name;
     @NotBlank(message = "Description is mandatory")
     private String description;
     @NotNull(message = "Price is mandatory")
     @DecimalMin(value = "0.0", message = "Price must be at least 0")
-    private BigDecimal  price;
+    private BigDecimal price;
     @NotNull(message = "Quantity is mandatory")
     @Min(value = 1, message = "Quantity must be at least 1")
     private Integer quantity;
@@ -26,6 +28,7 @@ public class ProductCreateDto {
     @DecimalMin(value = "0.0", message = "Discount must be at least 0")
     @DecimalMax(value = "100.0", message = "Discount must be at most 100")
     private BigDecimal discount;
+
     public Products toProduct() {
         Products product = new Products();
         product.setName(this.name);
@@ -33,6 +36,7 @@ public class ProductCreateDto {
         product.setPrice(this.price);
         product.setQuantity(this.quantity);
         product.setDiscount(this.discount);
+        product.setImage(this.image);
         return product;
     }
 }

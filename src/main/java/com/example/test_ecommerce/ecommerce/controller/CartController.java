@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,7 +22,7 @@ import com.example.test_ecommerce.ecommerce.services.CartService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/cart")
+@RequestMapping("/api/customer/cart")
 @PreAuthorize("hasRole('CUSTOMER')")
 public class CartController {
     private final CartService cartService;
@@ -31,33 +32,33 @@ public class CartController {
     }
 
     @GetMapping("/GetCart")
-    public ResponseEntity<CartItemsResponceDto> getCart() {
-        return ResponseEntity.ok(cartService.getCart());
+    public ResponseEntity<Map<String, CartItemsResponceDto>> getCart() {
+        return ResponseEntity.ok(Map.of("cart", cartService.getCart()));
     }
 
     @PostMapping("/AddItem")
-    public ResponseEntity<String> addItemToCart(@Valid @RequestBody CartItemDto cartItem) {
-        return ResponseEntity.ok(cartService.addItemToCart(cartItem));
+    public ResponseEntity<Map<String, String>> addItemToCart(@Valid @RequestBody CartItemDto cartItem) {
+        return ResponseEntity.ok(Map.of("message", cartService.addItemToCart(cartItem)));
     }
 
-    @PatchMapping("/update/{cartItemId}")
-    public ResponseEntity<String> updateQuantity(
+    @PutMapping("/update/{cartItemId}")
+    public ResponseEntity<Map<String, String>> updateQuantity(
             @PathVariable Long cartItemId,
             @Valid @RequestBody Map<String, Integer> cartItem) {
         String message = cartService.editItemQuantity(cartItemId, cartItem.get("quantity"));
-        return ResponseEntity.ok(message);
+        return ResponseEntity.ok(Map.of("message", message));
     }
 
     @DeleteMapping("/remove/{cartItemId}")
-    public ResponseEntity<String> removeItem(@PathVariable Long cartItemId) {
+    public ResponseEntity<Map<String, String>> removeItem(@PathVariable Long cartItemId) {
         String message = cartService.deleteItemFromCart(cartItemId);
-        return ResponseEntity.ok(message);
+        return ResponseEntity.ok(Map.of("message", message));
     }
 
     @DeleteMapping("/clear")
-    public ResponseEntity<String> clearCart() {
+    public ResponseEntity<Map<String, String>> clearCart() {
         String message = cartService.clearCart();
-        return ResponseEntity.ok(message);
+        return ResponseEntity.ok(Map.of("message", message));
     }
 
 }

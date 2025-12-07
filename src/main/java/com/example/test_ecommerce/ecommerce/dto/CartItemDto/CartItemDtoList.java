@@ -14,6 +14,7 @@ public class CartItemDtoList {
     private BigDecimal price;
     private Integer quantity;
     private BigDecimal totalPrice;
+    private String image;
 
     public void fromCartItem(CartItem cartItem) {
         this.cartItemId = cartItem.getId();
@@ -22,6 +23,7 @@ public class CartItemDtoList {
         this.price = cartItem.getPrice();
         this.quantity = cartItem.getQuantity();
         this.totalPrice = cartItem.getTotalPrice();
+        this.image = cartItem.getProduct().getImage();
     }
 
 }

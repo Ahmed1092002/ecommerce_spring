@@ -65,7 +65,7 @@ public class SellerAddressController {
      * Set an address as default
      * PATCH /api/seller/addresses/{id}/default
      */
-    @PatchMapping("/{id}/default")
+    @PutMapping("/{id}/default")
     public ResponseEntity<AddressResponse> setDefaultAddress(@PathVariable Long id) {
         return ResponseEntity.ok(addressService.setDefaultSellerAddress(id));
     }

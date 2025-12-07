@@ -52,8 +52,8 @@ public class ProductSellerController {
                 page, size, sortedColumn, name, minPrice, maxPrice, ascending));
     }
 
-    @DeleteMapping("/DeleteProduct")
-    public ResponseEntity<String> deleteProduct(@RequestParam Long productId) {
+    @DeleteMapping("/DeleteProduct/{productId}")
+    public ResponseEntity<HashMap<String, Object>> deleteProduct(@PathVariable Long productId) {
         return ResponseEntity.ok(productService.DeleteProduct(productId));
     }
 

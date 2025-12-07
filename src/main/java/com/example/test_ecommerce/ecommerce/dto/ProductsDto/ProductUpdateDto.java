@@ -13,6 +13,8 @@ import lombok.Data;
 
 @Data
 public class ProductUpdateDto {
+    @NotNull(message = "Image is mandatory")
+    private String image;
     @NotNull(message = "Id is mandatory")
     private Long id;
     @NotBlank(message = "Name is mandatory")
@@ -38,6 +40,7 @@ public class ProductUpdateDto {
         product.setPrice(this.price);
         product.setQuantity(this.quantity);
         product.setDiscount(this.discount);
+        product.setImage(this.image);
         return product;
     }
 
