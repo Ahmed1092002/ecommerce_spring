@@ -16,7 +16,7 @@ public interface ProductRepository extends JpaRepository<Products, Long> {
                         String name, Double minPrice, Double maxPrice, Pageable pageable);
 
         // create serch function for customer not based on user id contin serch by name
-        // and serch filter
+        //handle
         Page<Products> findByNameContainingIgnoreCaseAndPriceBetween(String name, Double minPrice, Double maxPrice,
                         Pageable pageable);
 
