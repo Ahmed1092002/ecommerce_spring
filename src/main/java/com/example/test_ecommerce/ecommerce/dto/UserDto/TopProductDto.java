@@ -11,13 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class SellerStatsResponse {
-
-    private Long totalProducts;
-    private Long totalOrders;
-    private Long pendingOrders;
-    private Long shippedOrders;
-    private Long deliveredOrders;
+public class TopProductDto {
+    private Long productId;
+    private String productName;
+    private Long quantitySold;
     private BigDecimal totalRevenue;
-    private BigDecimal averageOrderValue;
 }
