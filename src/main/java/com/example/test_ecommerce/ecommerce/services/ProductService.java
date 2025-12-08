@@ -172,4 +172,13 @@ public class ProductService {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundException("Product not found: " + productId));
     }
+
+    public List<ProductSearchResponceDto> getBestSellingProducts() {
+        List<Products> bestSellers = productRepository.findBestSellers();
+        return bestSellers.stream().map(product -> {
+            ProductSearchResponceDto responseDto = new ProductSearchResponceDto();
+            responseDto.fromEntity(product);
+            return responseDto;
+        }).collect(Collectors.toList());
+    }
 }

@@ -18,6 +18,7 @@ import com.example.test_ecommerce.ecommerce.services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
@@ -31,6 +32,11 @@ public class ProductPublicController {
     @GetMapping("/getProductByID/{id}")
     public ResponseEntity<ProductSearchResponceDto> getProductByID(@PathVariable Long id) {
         return ResponseEntity.ok(productService.getProductById(id));
+    }
+
+    @GetMapping("/bestSellers")
+    public ResponseEntity<List<ProductSearchResponceDto>> getBestSellingProducts() {
+        return ResponseEntity.ok(productService.getBestSellingProducts());
     }
 
 }
