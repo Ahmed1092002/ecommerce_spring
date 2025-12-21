@@ -18,6 +18,7 @@ public class CorsConfig {
                 // IMPORTANT: Only allow your frontend origin, NOT the backend
                 config.setAllowedOrigins(Arrays.asList(
                                 "http://localhost:3000",
+                                "http://localhost:3001",
                                 "https://ecommerce-nextjs-phi-lyart.vercel.app/",
                                 "http://127.0.0.1:3000"));
 

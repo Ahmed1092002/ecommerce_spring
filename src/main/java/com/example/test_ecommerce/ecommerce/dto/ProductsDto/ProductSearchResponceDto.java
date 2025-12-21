@@ -16,6 +16,7 @@ public class ProductSearchResponceDto {
     private Integer quantity;
     private BigDecimal discount;
     private BigDecimal finalPrice;
+    private boolean inWishlist;
 
     public void fromEntity(Products product) {
         this.id = product.getId();
