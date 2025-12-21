@@ -28,18 +28,6 @@ public class ProductCustomerController {
         this.productService = productService;
     }
 
-    @GetMapping("/GetProducts")
-    public ResponseEntity<GenericPageResponse<ProductSearchResponceDto>> getPublicCustomerProductsPaginationWithAscending(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortedColumn,
-            @RequestParam(defaultValue = "") String name,
-            @RequestParam(defaultValue = "0") double minPrice,
-            @RequestParam(defaultValue = Double.MAX_VALUE + "") double maxPrice,
-            @RequestParam(defaultValue = "true") boolean ascending) {
-        return ResponseEntity.ok(productService.getPublicProductsPaginationWithAscending(
-                page, size, sortedColumn, name, minPrice, maxPrice, ascending));
 
-    }
 
 }

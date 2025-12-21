@@ -22,20 +22,33 @@ public class GetCurrentUser {
     // Returns full Users entity
     public Users getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Users user = (Users) authentication.getPrincipal();
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication.getPrincipal().equals("anonymousUser")) {
+            return null;
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (!(principal instanceof Users)) {
+            return null;
+        }
+
+        Users user = (Users) principal;
         return userRepository.findById(user.getId())
-                .orElseThrow(() -> new RuntimeException("User not found: " + user.getUsername()));
+                .orElse(null);
     }
 
     public String getCurrentUsername() {
-        return getCurrentUser().getUsername();
+        Users user = getCurrentUser();
+        return user != null ? user.getUsername() : null;
     }
 
     public Long getCurrentUserId() {
-        return getCurrentUser().getId();
+        Users user = getCurrentUser();
+        return user != null ? user.getId() : null;
     }
 
     public UserType getCurrentUserRole() {
-        return getCurrentUser().getUserType();
+        Users user = getCurrentUser();
+        return user != null ? user.getUserType() : null;
     }
 }

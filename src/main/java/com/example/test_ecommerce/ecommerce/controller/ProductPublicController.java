@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.test_ecommerce.ecommerce.dto.GenericPageResponse.GenericPageResponse;
 import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductCreateDto;
 import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductSearchResponceDto;
 import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductUpdateDto;
@@ -37,6 +38,19 @@ public class ProductPublicController {
     @GetMapping("/bestSellers")
     public ResponseEntity<List<ProductSearchResponceDto>> getBestSellingProducts() {
         return ResponseEntity.ok(productService.getBestSellingProducts());
+    }
+        @GetMapping("/GetProducts")
+    public ResponseEntity<GenericPageResponse<ProductSearchResponceDto>> getPublicCustomerProductsPaginationWithAscending(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortedColumn,
+            @RequestParam(defaultValue = "") String name,
+            @RequestParam(defaultValue = "0") double minPrice,
+            @RequestParam(defaultValue = Double.MAX_VALUE + "") double maxPrice,
+            @RequestParam(defaultValue = "true") boolean ascending) {
+        return ResponseEntity.ok(productService.getPublicProductsPaginationWithAscending(
+                page, size, sortedColumn, name, minPrice, maxPrice, ascending));
+
     }
 
 }

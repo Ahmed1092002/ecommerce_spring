@@ -19,9 +19,13 @@ import com.example.test_ecommerce.ecommerce.dto.ProductsDto.ProductUpdateDto;
 import com.example.test_ecommerce.ecommerce.entitiy.Products;
 import com.example.test_ecommerce.ecommerce.enums.UserType;
 import com.example.test_ecommerce.ecommerce.repository.ProductRepository;
+import com.example.test_ecommerce.ecommerce.repository.projection.ProductWithWishlistStatus;
+import com.example.test_ecommerce.ecommerce.repository.projection.BestSellerProductProjection;
+import com.example.test_ecommerce.ecommerce.repository.projection.BestSellerProductDto;
 import com.example.test_ecommerce.ecommerce.utils.GetCurrentUser;
 import com.example.test_ecommerce.ecommerce.Exceptions.CustomExceptions.NotFoundException;
 import com.example.test_ecommerce.ecommerce.dto.GenericPageResponse.GenericPageResponse;
+import jakarta.persistence.Tuple;
 
 @Service
 public class ProductService {
@@ -92,11 +96,42 @@ public class ProductService {
 
         Sort sort = ascending ? Sort.by(sortedColumn).ascending() : Sort.by(sortedColumn).descending();
         Pageable pageable = PageRequest.of(page - 1, size, sort);
-        Page<Products> result = productRepository.findByNameContainingIgnoreCaseAndPriceBetween(name, minPrice,
-                maxPrice, pageable);
 
+        UserType currentUserRole = getCurrentUser.getCurrentUserRole();
+        if (currentUserRole != null && currentUserRole == UserType.CUSTOMER) {
+            Long customerProfileId = getCurrentUser.getCurrentUserId();
+            Page<ProductWithWishlistStatus> result =
+                productRepository.findByNameAndPriceWithWishlistStatus(customerProfileId, name, minPrice, maxPrice, pageable);
+            return mapToProductSearchResponceDtoWithWishlistProjection(result);
+        }
+
+        Page<Products> result = productRepository.findByNameContainingIgnoreCaseAndPriceBetween(name, minPrice, maxPrice, pageable);
         return mapToProductSearchResponceDto(result, page, size);
 
+    }
+
+    private GenericPageResponse<ProductSearchResponceDto> mapToProductSearchResponceDtoWithWishlistProjection(
+            Page<ProductWithWishlistStatus> result) {
+        List<ProductSearchResponceDto> productSearchResponceDtos = result.getContent()
+                .stream()
+                .map(projection -> {
+                    Products product = projection.getProduct();
+                    boolean inWishlist = Boolean.TRUE.equals(projection.getInWishlist());
+                    ProductSearchResponceDto dto = new ProductSearchResponceDto();
+                    dto.fromEntity(product);
+                    dto.setInWishlist(inWishlist);
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+        GenericPageResponse<ProductSearchResponceDto> mapping = new GenericPageResponse<>();
+        mapping.setPageNumber(result.getNumber() + 1);
+        mapping.setPageSize(result.getSize());
+        mapping.setTotalElements(result.getTotalElements());
+        mapping.setTotalPages(result.getTotalPages());
+        mapping.setData(productSearchResponceDtos);
+
+        return mapping;
     }
 
     private GenericPageResponse<ProductSearchResponceDto> mapToProductSearchResponceDto(Page<Products> result, int page,
@@ -138,6 +173,20 @@ public class ProductService {
     }
 
     public ProductSearchResponceDto getProductById(Long productId) {
+        if (getCurrentUser.getCurrentUserRole() == UserType.CUSTOMER) {
+            Long customerProfileId = getCurrentUser.getCurrentUserId();
+            ProductWithWishlistStatus result =
+                productRepository.findByIdWithWishlistStatus(productId, customerProfileId)
+                    .orElseThrow(() -> new NotFoundException("Product not found with id: " + productId));
+            Products product = result.getProduct();
+            Boolean inWishlist = result.getInWishlist();
+            ProductSearchResponceDto dto = new ProductSearchResponceDto();
+            dto.fromEntity(product);
+            dto.setFinalPrice(product.getFinalPrice());
+            dto.setInWishlist(Boolean.TRUE.equals(inWishlist));
+            return dto;
+        }
+
         Products product = productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundException("Product not found with id: " + productId));
         ProductSearchResponceDto dto = new ProductSearchResponceDto();
@@ -174,7 +223,26 @@ public class ProductService {
     }
 
     public List<ProductSearchResponceDto> getBestSellingProducts() {
-        List<Products> bestSellers = productRepository.findBestSellers();
+        UserType currentUserRole = getCurrentUser.getCurrentUserRole();
+        if (currentUserRole != null && currentUserRole == UserType.CUSTOMER) {
+            Long customerProfileId = getCurrentUser.getCurrentUserId();
+            List<BestSellerProductDto> result =
+                    productRepository.findBestSellers(customerProfileId);
+            return result.stream().map(dtoProjection -> {
+                ProductSearchResponceDto dto = new ProductSearchResponceDto();
+                dto.setId(dtoProjection.getId());
+                dto.setName(dtoProjection.getName());
+                dto.setDescription(dtoProjection.getDescription());
+                dto.setPrice(new BigDecimal(dtoProjection.getPrice()));
+                dto.setQuantity(dtoProjection.getQuantity());
+                dto.setDiscount(new BigDecimal(dtoProjection.getDiscount()));
+                dto.setImage(dtoProjection.getImage());
+                dto.setFinalPrice(new BigDecimal(dtoProjection.getFinalPrice()));
+                dto.setInWishlist(Boolean.TRUE.equals(dtoProjection.getInWishlist()));
+                return dto;
+            }).collect(Collectors.toList());
+        }
+        List<Products> bestSellers = productRepository.findForPublicBestSellers();
         return bestSellers.stream().map(product -> {
             ProductSearchResponceDto responseDto = new ProductSearchResponceDto();
             responseDto.fromEntity(product);
